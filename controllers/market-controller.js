@@ -1,30 +1,36 @@
 const Market = require('../models/market-model'); // Market modelini import ediyoruz
+const Depo = require('../models/depo');      // Depo modelini dahil ediyoruz
 
-// Market Oluşturma
+//Todo
+//Market Oluşturma 
 exports.create_market = async (req, res) => {
   try {
     // Kullanıcının rolü kontrol ediliyor
-    if (req.user.role !== "admin" || req.user.role !== "person") {
+    if (req.user.role !== "admin" && req.user.role !== "person") {
       return res.status(403).json({ message: "Bu işlemi yapmaya yetkiniz yok." });
     }
 
     // İstekten gelen verileri alıyoruz
-    const { name, location, linkedDepots } = req.body;
+    const { name, location, subDepo, person, products } = req.body;
 
     // Gerekli alanları kontrol edelim
-    if (!name || !location) {
-      return res.status(400).json({ message: "Market adı ve lokasyonu gereklidir." });
+    if (!name || !location || !person) {
+      return res.status(400).json({ message: "Market adı, lokasyon ve person gereklidir." });
     }
 
-    // Bağlantılı depolar varsa geçerliliğini kontrol edelim
-    if (linkedDepots && linkedDepots.length > 0) {
-      const invalidDepots = await main_depo.find({
-        _id: { $in: linkedDepots },
-        type: { $nin: ["main", "sub"] },
-      });
+    // SubDepo alanı varsa geçerliliğini kontrol edelim
+    if (subDepo) {
+      const invalidSubDepo = await Depo.findOne({ _id: subDepo, type: { $ne: "main" } });
+      if (!invalidSubDepo) {
+        return res.status(400).json({ message: "Geçersiz ana depo bağlantısı." });
+      }
+    }
 
-      if (invalidDepots.length > 0) {
-        return res.status(400).json({ message: "Geçersiz depo bağlantıları mevcut." });
+    // Ürünler varsa, geçerliliğini kontrol edelim
+    if (products && products.length > 0) {
+      const invalidProducts = await Product.find({ _id: { $in: products } });
+      if (invalidProducts.length !== products.length) {
+        return res.status(400).json({ message: "Geçersiz ürün bağlantıları." });
       }
     }
 
@@ -32,8 +38,9 @@ exports.create_market = async (req, res) => {
     const newMarket = new Market({
       name,
       location,
-      linkedDepots: linkedDepots || [], // İlişkili depolar varsa ekle, yoksa boş bırak
-      products: [], // Başlangıçta boş
+      person,
+      subDepo, // Ana depo (subDepo)
+      products: products || [], // Başlangıçta ürünler boş
     });
 
     // Marketi veritabanına kaydet
@@ -49,8 +56,11 @@ exports.create_market = async (req, res) => {
   }
 };
 
+//Todo
+//Ürün talep etme
 exports.request_product = async (req, res) => {
     try {
+      
       // Kullanıcının rolü kontrol ediliyor
       if (req.user.role !== "admin" || req.user.role !== "person") {
         return res.status(403).json({ message: "Bu işlemi yapmaya yetkiniz yok." });

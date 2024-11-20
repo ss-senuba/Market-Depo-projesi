@@ -2,7 +2,7 @@ const main_depo = require('../models/main-model');  // Ana depo modelini import 
 
 // Ara Depo Oluşturma
 exports.create_sub = async (req, res) => {
-  if (req.user.role !== "admin" || req.user.role !== "manager") {
+  if (req.user.role == "person") {
     return res.status(403).json({ message: "Bu işlemi yapmaya yetkiniz yok." });
   }
 
@@ -65,7 +65,7 @@ exports.request_product = async (req, res) => {
     const { subDepoId, productId, quantity } = req.body;
 
     // Kullanıcının rolü kontrol ediliyor
-    if (req.user.role !== "manager" || req.user.role !== "admin") {
+    if (req.user.role == "person") {
       return res.status(403).json({ message: "Bu işlemi yapmaya yetkiniz yok." });
     }
 
@@ -79,7 +79,7 @@ exports.request_product = async (req, res) => {
     if (!subDepo || subDepo.type !== "sub") {
       return res.status(404).json({ message: "Geçerli bir ara depo bulunamadı." });
     }
-
+    //Todo
     // Ana depo var mı kontrol edelim
     const mainDepo = await main_depo.findById(subDepo.mainDepo);
     if (!mainDepo || mainDepo.type !== "main") {

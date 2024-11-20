@@ -62,7 +62,7 @@ exports.update_product = async (req, res) => {
     }
   };
   
-
+//Todo burası olmuyor
 //Ürün silme 
 exports.delete_product = async (req, res) => {
     try {
@@ -87,7 +87,7 @@ exports.delete_product = async (req, res) => {
       }
   
       // Ürünü veritabanından siliyoruz
-      await productToDelete.remove();
+      await productToDelete.findByIdAndDelete(id);
   
       res.status(200).json({
         message: "Ürün başarıyla silindi."

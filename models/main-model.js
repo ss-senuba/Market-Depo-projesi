@@ -8,24 +8,26 @@ const main_shema = new Schema(
       type: String,
       required: true,
       trim: true,
-      unique:true,
+      unique: true,
     },
     location: {
       type: String,
       required: true,
       trim: true
     },
-    admin: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'admin',  
-      required: true
-    },
     products: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product'  // Depoda bulunan ürünler (Product modeline referans)
       }
-    ]
+    ],
+    subDepos: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'SubDepo'  // Ara depolar (SubDepo modeline referans)
+      }
+    ],
+    type: { type: String, required: true, default: 'main' },
   },
   {
     timestamps: true  // createdAt ve updatedAt otomatik olarak eklenir
