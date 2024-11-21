@@ -14,14 +14,9 @@ const market_shema = new Schema(
       required: true,
       trim: true
     },
-    person: {
+    subDepo: {  // Ara depoyu buraya ekliyoruz
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'person',
-      required: true
-    },
-    subDepo: {  // Ana depoyu buraya ekliyoruz
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Ara Depo'  // Ana depo modeline referans
+      ref: 'Ara Depo'  // Ara depo modeline referans
     },
     products: [
       {
